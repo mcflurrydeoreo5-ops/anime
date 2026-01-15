@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Animes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4c1d95 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            color: white;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+
+        .add-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-form input {
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .add-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .add-form input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #a78bfa;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #7c3aed;
+        }
+
+        .btn-status {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-status.watching {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-status.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-status.waiting {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-status.undefined {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-toggle {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .btn-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-toggle.active {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-waiting {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.7rem;
+            min-width: 70px;
+            background: rgba(245, 158, 11, 0.3);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            justify-content: center;
+        }
+
+        .btn-waiting:hover {
+            background: rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-waiting.active {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+
+        .btn-icon-small {
+            padding: 0.25rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+
+        .btn-edit {
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.8);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .btn-save {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #059669;
+        }
+
+        .btn-cancel {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #dc2626;
+        }
+
+        .btn-clear {
+            background: #f59e0b;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .btn-clear:hover {
+            background: #d97706;
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters label {
+            color: white;
+            font-weight: 600;
+        }
+
+        .filters select, .filters input {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .filters select option {
+            background: #4c1d95;
+            color: white;
+        }
+
+        .filters select:focus, .filters input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #a78bfa;
+        }
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+
+        th.center {
+            text-align: center;
+        }
+
+        tbody tr {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.2s;
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        td {
+            padding: 0.875rem;
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        td.center {
+            text-align: center;
+        }
+
+        .waiting-buttons {
+            display: flex;
+            gap: 0.25rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .star {
+            cursor: pointer;
+            transition: transform 0.2s;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 20px;
+        }
+
+        .star:hover {
+            transform: scale(1.1);
+        }
+
+        .star.active {
+            color: #fbbf24;
+        }
+
+        .note-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .note-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            flex: 1;
+        }
+
+        .note-text.empty {
+            color: rgba(255, 255, 255, 0.4);
+            font-style: italic;
+        }
+
+        .note-edit {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .note-edit input {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.875rem;
+        }
+
+        .note-edit input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .note-edit input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #a78bfa;
+        }
+
+        .empty-state {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .empty-state p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.125rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .stat-value.green {
+            color: #10b981;
+        }
+
+        .stat-value.blue {
+            color: #3b82f6;
+        }
+
+        .stat-value.orange {
+            color: #f59e0b;
+        }
+
+        .stat-value.gray {
+            color: #9ca3af;
+        }
+
+        .storage-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+
+        .storage-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .storage-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-export {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-export:hover {
+            background: #059669;
+        }
+
+        .btn-import {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-import:hover {
+            background: #2563eb;
+        }
+
+        #importFile {
+            display: none;
+        }
+
+        .link-display {
+            color: #60a5fa;
+            text-decoration: none;
+            word-break: break-all;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            flex: 1;
+        }
+
+        .link-display:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .link-type-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+
+        .link-type-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.25rem;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add-link {
+            background: rgba(59, 130, 246, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px dashed rgba(59, 130, 246, 0.5);
+            padding: 0.3rem 0.5rem;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            justify-content: center;
+        }
+
+        .btn-add-link:hover {
+            background: rgba(59, 130, 246, 0.5);
+            border-style: solid;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: scroll;
+            }
+
+            table {
+                min-width: 1000px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📺 Gestor de Animes</h1>
+
+        <div class="add-section">
+            <div class="add-form">
+                <input type="text" id="animeInput" placeholder="Nome do anime..." />
+            </div>
+            <div class="form-buttons">
+                <button class="btn btn-primary" onclick="addAnime()">
+                    <i class="fas fa-plus"></i>
+                    Adicionar
+                </button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <label>Pesquisar:</label>
+            <input type="text" id="searchInput" placeholder="Pesquisar anime..." oninput="applyFilters()" />
+            
+            <label>Estado:</label>
+            <select id="statusFilter" onchange="applyFilters()">
+                <option value="all">Todos</option>
+                <option value="undefined">Indefinido</option>
+                <option value="watching">Por Ver</option>
+                <option value="completed">Completos</option>
+                <option value="waiting">À Espera</option>
+            </select>
+        </div>
+
+        <div id="content"></div>
+
+        <div class="storage-info">
+            <p>💾 Os teus dados são guardados automaticamente no browser</p>
+            <div class="storage-buttons">
+                <button class="btn btn-export" onclick="exportData()">
+                    <i class="fas fa-download"></i>
+                    Exportar Dados
+                </button>
+                <button class="btn btn-import" onclick="document.getElementById('importFile').click()">
+                    <i class="fas fa-upload"></i>
+                    Importar Dados
+                </button>
+                <button class="btn btn-clear" onclick="clearAllData()">
+                    <i class="fas fa-trash-alt"></i>
+                    Limpar Todos os Dados
+                </button>
+            </div>
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)" />
+        </div>
+    </div>
+
+    <script>
+        let animes = [];
+        let editingNote = null;
+        let filters = {
+            search: '',
+            status: 'all',
+            type: 'all'
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('animeManagerData');
+            if (saved) {
+                try {
+                    animes = JSON.parse(saved);
+                } catch (e) {
+                    console.error('Erro ao carregar dados:', e);
+                    animes = [];
+                }
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('animeManagerData', JSON.stringify(animes));
+            } catch (e) {
+                console.error('Erro ao guardar dados:', e);
+                alert('Erro ao guardar dados. Verifica se tens espaço disponível no browser.');
+            }
+        }
+
+        function applyFilters() {
+            filters.search = document.getElementById('searchInput').value.toLowerCase();
+            filters.status = document.getElementById('statusFilter').value;
+            render();
+        }
+
+        function filterAnimes(animeList) {
+            return animeList.filter(anime => {
+                const matchSearch = anime.name.toLowerCase().includes(filters.search);
+                const matchStatus = filters.status === 'all' || anime.status === filters.status;
+                
+                return matchSearch && matchStatus;
+            });
+        }
+
+        function renderTable(animeList, title) {
+            if (animeList.length === 0) return '';
+
+            let html = `<h2>${title} (${animeList.length})</h2>`;
+            html += `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th class="center">Anime</th>
+                                <th class="center">Manga</th>
+                                <th class="center">Light Novel</th>
+                                <th class="center">Filme</th>
+                                <th class="center">À Espera De</th>
+                                <th class="center">Avaliação</th>
+                                <th>Notas</th>
+                                <th>Links</th>
+                                <th class="center">Estado</th>
+                                <th class="center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            animeList.forEach(anime => {
+                const escapedName = escapeHtml(anime.name);
+                const escapedNote = escapeHtml(anime.note);
+                const escapedLink = escapeHtml(anime.link || '');
+                
+                html += `
+                    <tr>
+                        <td><strong>${escapedName}</strong></td>
+                        <td class="center">
+                            <button class="btn btn-toggle ${anime.animeCompleted ? 'active' : ''}" 
+                                    onclick="toggleType(${anime.id}, 'anime')">
+                                ${anime.animeCompleted ? '✓' : '✗'}
+                            </button>
+                        </td>
+                        <td class="center">
+                            <button class="btn btn-toggle ${anime.mangaCompleted ? 'active' : ''}" 
+                                    onclick="toggleType(${anime.id}, 'manga')">
+                                ${anime.mangaCompleted ? '✓' : '✗'}
+                            </button>
+                        </td>
+                        <td class="center">
+                            <button class="btn btn-toggle ${anime.lightNovelCompleted ? 'active' : ''}" 
+                                    onclick="toggleType(${anime.id}, 'lightnovel')">
+                                ${anime.lightNovelCompleted ? '✓' : '✗'}
+                            </button>
+                        </td>
+                        <td class="center">
+                            <button class="btn btn-toggle ${anime.movieCompleted ? 'active' : ''}" 
+                                    onclick="toggleType(${anime.id}, 'movie')">
+                                ${anime.movieCompleted ? '✓' : '✗'}
+                            </button>
+                        </td>
+                        <td class="center">
+                            <div class="waiting-buttons">
+                                <button class="btn btn-waiting ${anime.waitingForAnime ? 'active' : ''}" 
+                                        onclick="toggleWaitingFor(${anime.id}, 'anime')" 
+                                        title="À espera de Anime">
+                                    <span>📺</span>
+                                    <span>Anime</span>
+                                </button>
+                                <button class="btn btn-waiting ${anime.waitingForManga ? 'active' : ''}" 
+                                        onclick="toggleWaitingFor(${anime.id}, 'manga')" 
+                                        title="À espera de Manga">
+                                    <span>📖</span>
+                                    <span>Manga</span>
+                                </button>
+                                <button class="btn btn-waiting ${anime.waitingForLightNovel ? 'active' : ''}" 
+                                        onclick="toggleWaitingFor(${anime.id}, 'lightnovel')" 
+                                        title="À espera de Light Novel">
+                                    <span>📚</span>
+                                    <span>LN</span>
+                                </button>
+                                <button class="btn btn-waiting ${anime.waitingForMovie ? 'active' : ''}" 
+                                        onclick="toggleWaitingFor(${anime.id}, 'movie')" 
+                                        title="À espera de Filme">
+                                    <span>🎬</span>
+                                    <span>Filme</span>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="center">
+                            <div class="stars">
+                                ${[1,2,3,4,5].map(star => `
+                                    <i class="fa${star <= anime.rating ? 's' : 'r'} fa-star star ${star <= anime.rating ? 'active' : ''}"
+                                       onclick="setRating(${anime.id}, ${star})"></i>
+                                `).join('')}
+                            </div>
+                        </td>
+                        <td>
+                            ${editingNote === anime.id ? `
+                                <div class="note-edit">
+                                    <input type="text" id="noteInput" value="${escapedNote}" 
+                                           placeholder="Notas..." 
+                                           onkeydown="handleNoteKeydown(event, ${anime.id})" />
+                                    <button class="btn btn-icon btn-save" onclick="saveNote(${anime.id})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-icon btn-cancel" onclick="cancelEdit()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            ` : `
+                                <div class="note-display">
+                                    <span class="note-text ${anime.note ? '' : 'empty'}">
+                                        ${escapedNote || 'Sem notas'}
+                                    </span>
+                                    <button class="btn btn-icon btn-edit" onclick="startEdit(${anime.id})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            `}
+                        </td>
+                        <td>
+                            <div class="links-container">
+                                <!-- Anime Links -->
+                                <div class="link-type-section">
+                                    <div class="link-type-header">📺 ANIME</div>
+                                    ${anime.linksAnime && anime.linksAnime.length > 0 ? anime.linksAnime.map((link, index) => {
+                                        const linkName = anime.linksAnimeNames && anime.linksAnimeNames[index] ? anime.linksAnimeNames[index] : `Link ${index + 1}`;
+                                        return `
+                                        <div class="link-item">
+                                            <a href="${escapeHtml(link)}" target="_blank" class="link-display" title="${escapeHtml(link)}">
+                                                🔗 ${escapeHtml(linkName)}
+                                            </a>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editLinkName(${anime.id}, 'linksAnime', ${index})" title="Renomear">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editTypeLink(${anime.id}, 'linksAnime', ${index})" title="Editar URL">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-delete" onclick="deleteTypeLink(${anime.id}, 'linksAnime', ${index})" title="Remover">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    `}).join('') : ''}
+                                    <button class="btn btn-add-link" onclick="addTypeLink(${anime.id}, 'linksAnime')">
+                                        <i class="fas fa-plus"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+
+                                <!-- Manga Links -->
+                                <div class="link-type-section">
+                                    <div class="link-type-header">📖 MANGA</div>
+                                    ${anime.linksManga && anime.linksManga.length > 0 ? anime.linksManga.map((link, index) => {
+                                        const linkName = anime.linksMangaNames && anime.linksMangaNames[index] ? anime.linksMangaNames[index] : `Link ${index + 1}`;
+                                        return `
+                                        <div class="link-item">
+                                            <a href="${escapeHtml(link)}" target="_blank" class="link-display" title="${escapeHtml(link)}">
+                                                🔗 ${escapeHtml(linkName)}
+                                            </a>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editLinkName(${anime.id}, 'linksManga', ${index})" title="Renomear">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editTypeLink(${anime.id}, 'linksManga', ${index})" title="Editar URL">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-delete" onclick="deleteTypeLink(${anime.id}, 'linksManga', ${index})" title="Remover">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    `}).join('') : ''}
+                                    <button class="btn btn-add-link" onclick="addTypeLink(${anime.id}, 'linksManga')">
+                                        <i class="fas fa-plus"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+
+                                <!-- Light Novel Links -->
+                                <div class="link-type-section">
+                                    <div class="link-type-header">📚 LIGHT NOVEL</div>
+                                    ${anime.linksLightNovel && anime.linksLightNovel.length > 0 ? anime.linksLightNovel.map((link, index) => {
+                                        const linkName = anime.linksLightNovelNames && anime.linksLightNovelNames[index] ? anime.linksLightNovelNames[index] : `Link ${index + 1}`;
+                                        return `
+                                        <div class="link-item">
+                                            <a href="${escapeHtml(link)}" target="_blank" class="link-display" title="${escapeHtml(link)}">
+                                                🔗 ${escapeHtml(linkName)}
+                                            </a>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editLinkName(${anime.id}, 'linksLightNovel', ${index})" title="Renomear">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editTypeLink(${anime.id}, 'linksLightNovel', ${index})" title="Editar URL">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-delete" onclick="deleteTypeLink(${anime.id}, 'linksLightNovel', ${index})" title="Remover">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    `}).join('') : ''}
+                                    <button class="btn btn-add-link" onclick="addTypeLink(${anime.id}, 'linksLightNovel')">
+                                        <i class="fas fa-plus"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+
+                                <!-- Movie Links -->
+                                <div class="link-type-section">
+                                    <div class="link-type-header">🎬 FILME</div>
+                                    ${anime.linksMovie && anime.linksMovie.length > 0 ? anime.linksMovie.map((link, index) => {
+                                        const linkName = anime.linksMovieNames && anime.linksMovieNames[index] ? anime.linksMovieNames[index] : `Link ${index + 1}`;
+                                        return `
+                                        <div class="link-item">
+                                            <a href="${escapeHtml(link)}" target="_blank" class="link-display" title="${escapeHtml(link)}">
+                                                🔗 ${escapeHtml(linkName)}
+                                            </a>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editLinkName(${anime.id}, 'linksMovie', ${index})" title="Renomear">
+                                                <i class="fas fa-pen"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-edit" onclick="editTypeLink(${anime.id}, 'linksMovie', ${index})" title="Editar URL">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-icon-small btn-delete" onclick="deleteTypeLink(${anime.id}, 'linksMovie', ${index})" title="Remover">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    `}).join('') : ''}
+                                    <button class="btn btn-add-link" onclick="addTypeLink(${anime.id}, 'linksMovie')">
+                                        <i class="fas fa-plus"></i>
+                                        Adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="center">
+                            <select class="btn btn-status ${anime.status}" onchange="changeStatus(${anime.id}, this.value)">
+                                <option value="undefined" ${anime.status === 'undefined' ? 'selected' : ''}>Indefinido</option>
+                                <option value="watching" ${anime.status === 'watching' ? 'selected' : ''}>Por Ver</option>
+                                <option value="completed" ${anime.status === 'completed' ? 'selected' : ''}>Completo</option>
+                                <option value="waiting" ${anime.status === 'waiting' ? 'selected' : ''}>À Espera</option>
+                            </select>
+                        </td>
+                        <td class="center">
+                            <div class="action-buttons">
+                                <button class="btn btn-icon btn-delete" onclick="removeAnime(${anime.id})" title="Remover">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function render() {
+            const content = document.getElementById('content');
+            
+            const filteredAnimes = filterAnimes(animes);
+
+            if (filteredAnimes.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <p>${animes.length === 0 ? 'Ainda não adicionaste nenhum anime. Começa agora! 🎌' : 'Nenhum anime encontrado com estes filtros.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const undefined = filteredAnimes.filter(a => a.status === 'undefined');
+            const watching = filteredAnimes.filter(a => a.status === 'watching');
+            const completed = filteredAnimes.filter(a => a.status === 'completed');
+            const waiting = filteredAnimes.filter(a => a.status === 'waiting');
+
+            let html = '';
+            html += renderTable(undefined, '⚪ Indefinido');
+            html += renderTable(watching, '🔵 Por Ver');
+            html += renderTable(completed, '✅ Completos');
+            html += renderTable(waiting, '⏳ À Espera');
+
+            const totalUndefined = animes.filter(a => a.status === 'undefined').length;
+            const totalCompleted = animes.filter(a => a.status === 'completed').length;
+            const totalWatching = animes.filter(a => a.status === 'watching').length;
+            const totalWaiting = animes.filter(a => a.status === 'waiting').length;
+
+            html += `
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total de Animes</div>
+                        <div class="stat-value">${animes.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Indefinido</div>
+                        <div class="stat-value gray">${totalUndefined}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Por Ver</div>
+                        <div class="stat-value blue">${totalWatching}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completos</div>
+                        <div class="stat-value green">${totalCompleted}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">À Espera</div>
+                        <div class="stat-value orange">${totalWaiting}</div>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addAnime() {
+            const nameInput = document.getElementById('animeInput');
+            const name = nameInput.value.trim();
+            
+            if (name) {
+                animes.push({
+                    id: Date.now(),
+                    name: name,
+                    linksAnime: [],
+                    linksManga: [],
+                    linksLightNovel: [],
+                    linksMovie: [],
+                    linksAnimeNames: [],
+                    linksMangaNames: [],
+                    linksLightNovelNames: [],
+                    linksMovieNames: [],
+                    status: 'undefined',
+                    waitingForAnime: false,
+                    waitingForManga: false,
+                    waitingForLightNovel: false,
+                    waitingForMovie: false,
+                    animeCompleted: false,
+                    mangaCompleted: false,
+                    lightNovelCompleted: false,
+                    movieCompleted: false,
+                    rating: 0,
+                    note: ''
+                });
+                nameInput.value = '';
+                saveData();
+                render();
+            }
+        }
+
+        function removeAnime(id) {
+            if (confirm('Tens a certeza que queres remover este anime?')) {
+                animes = animes.filter(a => a.id !== id);
+                saveData();
+                render();
+            }
+        }
+
+        function toggleType(id, type) {
+            const field = type === 'anime' ? 'animeCompleted' :
+                         type === 'manga' ? 'mangaCompleted' :
+                         type === 'lightnovel' ? 'lightNovelCompleted' :
+                         'movieCompleted';
+            
+            animes = animes.map(a => 
+                a.id === id ? { ...a, [field]: !a[field] } : a
+            );
+            saveData();
+            render();
+        }
+
+        function changeStatus(id, newStatus) {
+            animes = animes.map(a => 
+                a.id === id ? { ...a, status: newStatus } : a
+            );
+            saveData();
+            render();
+        }
+
+        function toggleWaitingFor(id, type) {
+            const field = type === 'anime' ? 'waitingForAnime' :
+                         type === 'manga' ? 'waitingForManga' :
+                         type === 'lightnovel' ? 'waitingForLightNovel' :
+                         'waitingForMovie';
+            
+            animes = animes.map(a => {
+                if (a.id === id) {
+                    return { ...a, [field]: !a[field] };
+                }
+                return a;
+            });
+            saveData();
+            render();
+        }
+
+        function addTypeLink(id, linkType) {
+            const linkNames = {
+                'linksAnime': 'Anime',
+                'linksManga': 'Manga',
+                'linksLightNovel': 'Light Novel',
+                'linksMovie': 'Filme'
+            };
+            
+            const nameType = linkType + 'Names';
+            
+            const url = prompt(`Introduz o link do ${linkNames[linkType]}:`);
+            if (url !== null && url.trim()) {
+                const linkName = prompt('Nome do link (opcional):', '') || `Link ${(animes.find(a => a.id === id)?.[linkType]?.length || 0) + 1}`;
+                
+                animes = animes.map(a => {
+                    if (a.id === id) {
+                        const links = a[linkType] || [];
+                        const names = a[nameType] || [];
+                        return { 
+                            ...a, 
+                            [linkType]: [...links, url.trim()],
+                            [nameType]: [...names, linkName]
+                        };
+                    }
+                    return a;
+                });
+                saveData();
+                render();
+            }
+        }
+
+        function editLinkName(id, linkType, index) {
+            const anime = animes.find(a => a.id === id);
+            if (!anime) return;
+            
+            const nameType = linkType + 'Names';
+            const currentName = anime[nameType] && anime[nameType][index] ? anime[nameType][index] : `Link ${index + 1}`;
+            
+            const newName = prompt('Alterar nome do link:', currentName);
+            
+            if (newName !== null && newName.trim()) {
+                animes = animes.map(a => {
+                    if (a.id === id) {
+                        const names = [...(a[nameType] || [])];
+                        names[index] = newName.trim();
+                        return { ...a, [nameType]: names };
+                    }
+                    return a;
+                });
+                saveData();
+                render();
+            }
+        }
+
+        function editTypeLink(id, linkType, index) {
+            const anime = animes.find(a => a.id === id);
+            if (!anime || !anime[linkType]) return;
+            
+            const linkNames = {
+                'linksAnime': 'Anime',
+                'linksManga': 'Manga',
+                'linksLightNovel': 'Light Novel',
+                'linksMovie': 'Filme'
+            };
+            
+            const currentLink = anime[linkType][index];
+            const url = prompt(`Editar link do ${linkNames[linkType]}:`, currentLink);
+            
+            if (url !== null) {
+                animes = animes.map(a => {
+                    if (a.id === id) {
+                        const newLinks = [...a[linkType]];
+                        if (url.trim()) {
+                            newLinks[index] = url.trim();
+                        } else {
+                            newLinks.splice(index, 1);
+                        }
+                        return { ...a, [linkType]: newLinks };
+                    }
+                    return a;
+                });
+                saveData();
+                render();
+            }
+        }
+
+        function deleteTypeLink(id, linkType, index) {
+            if (confirm('Tens a certeza que queres remover este link?')) {
+                const nameType = linkType + 'Names';
+                
+                animes = animes.map(a => {
+                    if (a.id === id) {
+                        const newLinks = [...a[linkType]];
+                        const newNames = [...(a[nameType] || [])];
+                        newLinks.splice(index, 1);
+                        newNames.splice(index, 1);
+                        return { ...a, [linkType]: newLinks, [nameType]: newNames };
+                    }
+                    return a;
+                });
+                saveData();
+                render();
+            }
+        }
+
+        function setRating(id, rating) {
+            animes = animes.map(a => 
+                a.id === id ? { ...a, rating } : a
+            );
+            saveData();
+            render();
+        }
+
+        function startEdit(id) {
+            editingNote = id;
+            render();
+            setTimeout(() => {
+                const input = document.getElementById('noteInput');
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }, 0);
+        }
+
+        function saveNote(id) {
+            const input = document.getElementById('noteInput');
+            if (input) {
+                animes = animes.map(a => 
+                    a.id === id ? { ...a, note: input.value } : a
+                );
+                saveData();
+            }
+            editingNote = null;
+            render();
+        }
+
+        function cancelEdit() {
+            editingNote = null;
+            render();
+        }
+
+        function handleNoteKeydown(event, id) {
+            if (event.key === 'Enter') {
+                saveNote(id);
+            } else if (event.key === 'Escape') {
+                cancelEdit();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('ATENÇÃO! Isto vai apagar TODOS os teus animes permanentemente. Tens a certeza?')) {
+                if (confirm('Última confirmação! Os dados não podem ser recuperados. Continuar?')) {
+                    animes = [];
+                    localStorage.removeItem('animeManagerData');
+                    render();
+                    alert('Todos os dados foram apagados!');
+                }
+            }
+        }
+
+        function exportData() {
+            if (animes.length === 0) {
+                alert('Não há dados para exportar!');
+                return;
+            }
+
+            const dataStr = JSON.stringify(animes, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            
+            const date = new Date().toISOString().split('T')[0];
+            link.download = `anime-manager-backup-${date}.json`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert(`✅ Dados exportados com sucesso!\n${animes.length} animes guardados no ficheiro.`);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(importedData)) {
+                        throw new Error('Formato de ficheiro inválido');
+                    }
+
+                    const validData = importedData.every(anime => 
+                        anime.id && anime.name && anime.status
+                    );
+
+                    if (!validData) {
+                        throw new Error('Dados inválidos no ficheiro');
+                    }
+
+                    const confirmMsg = animes.length > 0 
+                        ? `Tens ${animes.length} animes guardados.\n\nO que queres fazer?\n\nOK = Substituir tudo\nCancelar = Manter e adicionar novos`
+                        : `Vais importar ${importedData.length} animes. Continuar?`;
+
+                    const replace = confirm(confirmMsg);
+
+                    if (replace) {
+                        animes = importedData;
+                    } else {
+                        const existingIds = new Set(animes.map(a => a.id));
+                        const newAnimes = importedData.filter(a => !existingIds.has(a.id));
+                        animes = [...animes, ...newAnimes];
+                    }
+
+                    saveData();
+                    render();
+                    alert(`✅ Importação concluída!\n${importedData.length} animes importados.`);
+                    
+                } catch (error) {
+                    alert('❌ Erro ao importar ficheiro!\n\n' + error.message + '\n\nVerifica se o ficheiro é válido.');
+                }
+            };
+
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        document.getElementById('animeInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addAnime();
+        });
+
+        loadData();
+        render();
+    </script>
+</body>
+</html>
